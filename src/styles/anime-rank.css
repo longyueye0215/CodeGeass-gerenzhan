@@ -1,0 +1,205 @@
+/* ===== 胧月夜の动漫评分表 · 自定义排名（磁吸拖拽） ===== */
+
+.anime-rank {
+  --ar-panel: rgba(6, 12, 20, 0.66);
+  --ar-panel-2: rgba(4, 8, 14, 0.5);
+  --ar-line: rgba(140, 186, 255, 0.22);
+  --ar-line-mid: rgba(140, 186, 255, 0.34);
+  --ar-line-soft: rgba(140, 186, 255, 0.12);
+  --ar-text: #e6f1ff;
+  --ar-muted: rgba(188, 214, 245, 0.62);
+  --ar-accent: #7fd4ff;
+  --ar-gold: #ffd166;
+  --ar-chip-bg: rgba(10, 18, 30, 0.7);
+  --ar-zone-bg: rgba(4, 8, 14, 0.45);
+  --ar-zone-line: rgba(140, 186, 255, 0.16);
+  --ar-hover: rgba(127, 212, 255, 0.16);
+  --ar-tip-bg: rgba(4, 9, 16, 0.92);
+  --ar-tip-line: rgba(140, 186, 255, 0.4);
+  --ar-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  --ar-corner: rgba(226, 244, 255, 0.7);
+
+  position: relative;
+  margin: 6px auto 40px;
+  max-width: 940px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  color: var(--ar-text);
+  font-family: inherit;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 顶栏外框 + 取景角标 */
+.ar-frame {
+  position: relative;
+  padding: 16px 20px 14px;
+  background: var(--ar-panel);
+  border: 1px solid var(--ar-line);
+  border-radius: 14px;
+  box-shadow: var(--ar-shadow);
+  backdrop-filter: blur(6px);
+}
+.anime-rank .doc-art-corner {
+  border-color: var(--ar-corner);
+  filter: drop-shadow(0 0 5px rgba(150, 200, 255, 0.55));
+  width: 13px;
+  height: 13px;
+}
+.ar-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--ar-muted);
+  text-transform: uppercase;
+}
+.ar-title {
+  margin: 8px 0 4px;
+  font-size: clamp(20px, 3.4vw, 30px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--ar-text);
+  text-shadow: 0 0 16px rgba(127, 212, 255, 0.28);
+}
+
+/* 档位表 */
+.ar-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ar-tier {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1px solid var(--ar-line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ar-panel);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+.ar-tier-label {
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  border-right: 1px solid var(--ar-line-soft);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.ar-tier-zone {
+  flex: 1 1 auto;
+  min-height: 92px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 7px;
+  padding: 10px 12px;
+  background: var(--ar-zone-bg);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.ar-zone-hint {
+  align-self: center;
+  margin: auto;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--ar-muted);
+  opacity: 0.7;
+}
+
+/* 封面缩略图（档位芯片） */
+.ar-cover {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: 9px;
+  overflow: visible;
+  cursor: default;
+  border: 1px solid var(--ar-line);
+  background: var(--ar-chip-bg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+  touch-action: none;
+}
+.ar-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  pointer-events: none;
+}
+.ar-cover:hover {
+  transform: translateY(-3px);
+  border-color: var(--ar-accent);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), 0 0 14px rgba(127, 212, 255, 0.3);
+}
+/* 档位内的小芯片 */
+.ar-chip {
+  flex: 0 0 auto;
+  width: 54px;
+  border-radius: 7px;
+}
+.ar-chip img {
+  border-radius: 6px;
+}
+
+/* 悬停名称气泡 */
+.ar-tip {
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  z-index: 60;
+  padding: 4px 9px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: var(--ar-text);
+  background: var(--ar-tip-bg);
+  border: 1px solid var(--ar-tip-line);
+  border-radius: 7px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.ar-cover:hover .ar-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* 拖拽幽灵卡片 */
+
+/* ===== 白昼 / 日间模式 ===== */
+.doc.light .anime-rank {
+  --ar-panel: rgba(255, 255, 255, 0.74);
+  --ar-panel-2: rgba(255, 255, 255, 0.62);
+  --ar-line: rgba(50, 80, 130, 0.22);
+  --ar-line-mid: rgba(50, 80, 130, 0.36);
+  --ar-line-soft: rgba(50, 80, 130, 0.12);
+  --ar-text: #16233a;
+  --ar-muted: rgba(40, 60, 90, 0.7);
+  --ar-accent: #2a8fc4;
+  --ar-gold: #b8860b;
+  --ar-chip-bg: rgba(255, 255, 255, 0.9);
+  --ar-zone-bg: rgba(244, 248, 252, 0.72);
+  --ar-zone-line: rgba(50, 80, 130, 0.18);
+  --ar-hover: rgba(42, 143, 196, 0.14);
+  --ar-tip-bg: rgba(255, 255, 255, 0.96);
+  --ar-tip-line: rgba(50, 80, 130, 0.4);
+  --ar-shadow: 0 18px 44px rgba(70, 100, 150, 0.2);
+  --ar-corner: rgba(40, 70, 120, 0.6);
+  backdrop-filter: blur(4px);
+}
+.doc.light .ar-cover {
+  box-shadow: 0 6px 16px rgba(60, 90, 140, 0.18);
+}
+.doc.light .ar-cover:hover {
+  box-shadow: 0 10px 22px rgba(60, 90, 140, 0.24), 0 0 14px rgba(42, 143, 196, 0.3);
+}

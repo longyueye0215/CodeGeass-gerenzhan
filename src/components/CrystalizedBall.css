@@ -1,0 +1,52 @@
+.crystalized-ball {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.crystalized-ball canvas {
+  position: absolute;
+  inset: 0;
+}
+
+/* WebGL2 不可用或渲染失败时的透明兜底球（中空发光环，透出背景） */
+.crystalized-ball.cb-fallback::before {
+  content: '';
+  position: absolute;
+  inset: 2%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 66%, rgba(120, 180, 255, 0.06) 79%, rgba(150, 205, 255, 0.22) 92%, rgba(235, 246, 255, 0.4) 98%, transparent 100%);
+  box-shadow:
+    0 0 16px rgba(90, 150, 255, 0.2),
+    0 0 40px rgba(60, 110, 230, 0.1);
+  animation: cbPulse 4.5s ease-in-out infinite;
+}
+
+.crystalized-ball.cb-fallback::after {
+  content: '';
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.2), rgba(160, 210, 255, 0.08) 38%, transparent 68%);
+  filter: blur(2px);
+}
+
+@keyframes cbPulse {
+  0%,
+  100% {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crystalized-ball.cb-fallback::before {
+    animation: none;
+  }
+}

@@ -1,0 +1,323 @@
+/* ============ 胧月夜の歌单 ============ */
+.pl-page {
+  position: relative;
+  min-height: 70vh;
+}
+
+/* 欢迎页：只有三行字，固定居中在整页正中 */
+.pl-welcome {
+  position: fixed;
+  inset: 0;
+  /* 必须与 .doc-sheet 同层或更高，否则那层透明容器会盖住粒子画布，
+     把指针事件全部吃掉（画作就"失去鼠标互动"了） */
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  text-align: center;
+  pointer-events: none;
+  animation: plFade 0.7s ease both;
+}
+
+/* 粒子画作：压在整组的偏上方，宽度按 2431:1080 的原图比例 */
+.pl-art {
+  position: relative;
+  width: min(760px, 64vw);
+  aspect-ratio: 2431 / 1080;
+  border: 1px solid rgba(214, 236, 255, 0.26);
+  background: #04070d;
+  overflow: hidden;
+  pointer-events: auto;
+  box-shadow:
+    0 26px 70px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(120, 170, 220, 0.12),
+    0 0 40px rgba(190, 40, 50, 0.12);
+}
+
+/* 四角取景括号 */
+.pl-art-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) left 6px top 6px / 16px 1px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) left 6px top 6px / 1px 16px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) right 6px top 6px / 16px 1px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) right 6px top 6px / 1px 16px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) left 6px bottom 6px / 16px 1px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) left 6px bottom 6px / 1px 16px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) right 6px bottom 6px / 16px 1px no-repeat,
+    linear-gradient(rgba(226, 244, 255, 0.55), rgba(226, 244, 255, 0.55)) right 6px bottom 6px / 1px 16px no-repeat;
+}
+
+.pl-lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 13px;
+}
+
+.pl-welcome p {
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.2em;
+  text-indent: 0.2em;
+  color: #e8f4ff;
+  text-shadow: 0 0 18px rgba(120, 190, 255, 0.35);
+}
+
+.pl-lines p:nth-child(2) {
+  color: #ffd98a;
+  text-shadow: 0 0 18px rgba(255, 196, 90, 0.3);
+}
+
+.pl-lines p:nth-child(3) {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  color: rgba(170, 205, 240, 0.66);
+  text-shadow: none;
+}
+
+@keyframes plFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 歌单头部 */
+.pl-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pl-back {
+  align-self: center;
+  min-height: 30px;
+  padding: 6px 16px;
+  font-size: 12px;
+  touch-action: manipulation;
+  letter-spacing: 0.16em;
+  color: rgba(200, 226, 250, 0.86);
+  background: rgba(8, 14, 24, 0.6);
+  border: 1px solid rgba(200, 226, 250, 0.3);
+  cursor: pointer;
+  transition: color 0.24s, border-color 0.24s;
+}
+
+.pl-back:hover {
+  color: #ffd166;
+  border-color: rgba(255, 209, 102, 0.6);
+}
+
+.pl-title {
+  font-size: 16px;
+  letter-spacing: 0.1em;
+  color: #eaf4ff;
+}
+
+.pl-count {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: rgba(150, 190, 230, 0.62);
+}
+
+/* 曲目列表 */
+.pl-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 820px;
+  padding-bottom: 40px;
+}
+
+.pl-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 4px;
+  border-bottom: 1px dashed rgba(160, 200, 240, 0.14);
+  font-size: 12px;
+  line-height: 1.6;
+  transition: background 0.2s, color 0.2s;
+}
+
+.pl-row:hover {
+  background: rgba(120, 180, 255, 0.07);
+}
+
+.pl-no {
+  flex: none;
+  width: 26px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(140, 180, 220, 0.55);
+}
+
+.pl-song {
+  color: rgba(232, 244, 255, 0.92);
+  letter-spacing: 0.02em;
+}
+
+.pl-dots {
+  flex: 1;
+  min-width: 16px;
+  height: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px dotted rgba(160, 200, 240, 0.24);
+}
+
+.pl-artist {
+  flex: none;
+  max-width: 40%;
+  text-align: right;
+  font-size: 11px;
+  color: rgba(255, 214, 140, 0.9);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============ 左下角目录弹窗 ============ */
+.plc {
+  position: fixed;
+  left: 34px;
+  bottom: 82px;
+  z-index: 70;
+}
+
+.plc-panel {
+  width: 236px;
+  background: #171a28;
+  border: 1px solid rgba(214, 228, 250, 0.4);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  animation: plcIn 0.22s ease both;
+}
+
+@keyframes plcIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.plc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: #dce8fa;
+  border-bottom: 1px solid rgba(214, 228, 250, 0.18);
+}
+
+.plc-close {
+  width: 20px;
+  height: 20px;
+  font-size: 15px;
+  line-height: 1;
+  color: rgba(200, 226, 250, 0.7);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.plc-close:hover {
+  color: #ffd166;
+}
+
+.plc-body {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+}
+
+.plc-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 8px;
+  font-size: 12px;
+  color: #dfe9f8;
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.plc-row svg {
+  flex: none;
+  color: rgba(150, 195, 245, 0.85);
+}
+
+.plc-label {
+  flex: 1;
+  text-align: left;
+  letter-spacing: 0.06em;
+}
+
+.plc-n {
+  font-size: 10px;
+  color: rgba(150, 190, 230, 0.6);
+}
+
+.plc-row:hover,
+.plc-row.on {
+  color: #ffd166;
+  background: rgba(120, 180, 255, 0.1);
+  border-color: rgba(255, 209, 102, 0.35);
+}
+
+.plc-row.on svg {
+  color: #ffd166;
+}
+
+/* 白昼模式 */
+.doc.light .pl-welcome p {
+  color: #1d2938;
+  text-shadow: none;
+}
+
+.doc.light .pl-welcome p:nth-child(2) {
+  color: #9a6b1e;
+}
+
+.doc.light .pl-welcome p:nth-child(3) {
+  color: rgba(60, 80, 100, 0.6);
+}
+
+.doc.light .pl-title {
+  color: #1d2938;
+}
+
+.doc.light .pl-song {
+  color: rgba(35, 45, 58, 0.92);
+}
+
+.doc.light .pl-artist {
+  color: #9a6b1e;
+}
+
+.doc.light .pl-row {
+  border-bottom-color: rgba(120, 150, 180, 0.22);
+}
+
+.doc.light .pl-back {
+  color: #3a3227;
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(176, 141, 62, 0.45);
+}

@@ -1,0 +1,12 @@
+.gw-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* 画布按不透明黑底渲染，再整体用滤色叠加到页面上，
+   黑底自然消失、星光只做加法，不会压暗底图。 */
+.gw-root canvas {
+  mix-blend-mode: screen;
+}

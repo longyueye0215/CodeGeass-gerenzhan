@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'zpix';
+  /* 已按站内实际用到的 3500 余字符做子集：6.9MB → 137KB */
+  src: url('/fonts/zpix.woff2') format('woff2');
+  font-display: swap;
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --scale: 1;
+
+  --ink-900: #04070d;
+  --ink-850: #060a12;
+  --ink-800: #0a1019;
+  --ink-700: #0e1624;
+  --ink-600: #131f31;
+
+  --line: rgba(140, 186, 255, 0.2);
+  --line-mid: rgba(140, 186, 255, 0.34);
+  --line-strong: rgba(160, 205, 255, 0.55);
+
+  --text-hi: #e6f1ff;
+  --text-mid: #a3bdd8;
+  --text-low: #6b8299;
+
+  --accent: #7fd4ff;
+  --accent-soft: rgba(127, 212, 255, 0.55);
+  --accent-faint: rgba(127, 212, 255, 0.14);
+  --warn: #ffb86c;
+
+  --hud-pad: 22px;
+  --hud-gap: 12px;
+
+  --fs-1: calc(var(--scale) * 12px);
+  --fs-2: calc(var(--scale) * 12px);
+  --fs-3: calc(var(--scale) * 24px);
+  --fs-4: calc(var(--scale) * 36px);
+  --fs-5: calc(var(--scale) * 48px);
+  --fs-6: calc(var(--scale) * 72px);
+}

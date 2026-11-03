@@ -1,0 +1,567 @@
+/* ==========================================================================
+   手机端独立界面（html[data-mode='mobile'] 时生效）
+   PC 端完全不受影响：所有规则都挂在 data-mode 下
+   ========================================================================== */
+
+html[data-mode='mobile'] {
+  --m-safe-top: env(safe-area-inset-top, 0px);
+  --m-safe-bottom: env(safe-area-inset-bottom, 0px);
+  background: #04070d;
+}
+
+html[data-mode='mobile'] body {
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html[data-mode='mobile'] .m-shell {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 0%, #0b1726 0%, #04070d 62%);
+  color: #e8f4ff;
+  font-family: 'zpix', 'Courier New', monospace;
+}
+
+html[data-mode='mobile'] .m-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(70% 50% at 50% 100%, rgba(30, 60, 100, 0.35), transparent 70%),
+    linear-gradient(180deg, rgba(4, 7, 13, 0) 40%, rgba(4, 7, 13, 0.9) 100%);
+  pointer-events: none;
+}
+
+/* ---------- 首页 ---------- */
+html[data-mode='mobile'] .m-home {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: calc(18px + var(--m-safe-top)) 16px calc(14px + var(--m-safe-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html[data-mode='mobile'] .m-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 2px 18px;
+}
+
+html[data-mode='mobile'] .m-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(160, 200, 240, 0.32);
+  background: rgba(8, 14, 24, 0.6);
+  object-fit: contain;
+}
+
+html[data-mode='mobile'] .m-kicker {
+  margin: 0;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  color: rgba(150, 190, 230, 0.7);
+}
+
+html[data-mode='mobile'] .m-brand {
+  margin: 2px 0 0;
+  font-size: 27px;
+  line-height: 1.15;
+  letter-spacing: 0.12em;
+  color: #eaf6ff;
+  text-shadow: 0 0 22px rgba(120, 190, 255, 0.35);
+}
+
+html[data-mode='mobile'] .m-sub {
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  color: rgba(180, 210, 240, 0.62);
+}
+
+html[data-mode='mobile'] .m-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+html[data-mode='mobile'] .m-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px 1fr 18px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid rgba(150, 195, 240, 0.2);
+  border-radius: 4px;
+  background: linear-gradient(135deg, rgba(14, 26, 42, 0.86), rgba(6, 11, 20, 0.9));
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 0.25s ease,
+    transform 0.18s ease,
+    box-shadow 0.25s ease;
+}
+
+html[data-mode='mobile'] .m-card:active {
+  transform: scale(0.985);
+  border-color: rgba(143, 225, 255, 0.6);
+  box-shadow: 0 0 20px rgba(120, 190, 255, 0.18);
+}
+
+html[data-mode='mobile'] .m-card-art {
+  position: relative;
+  display: block;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid rgba(160, 200, 240, 0.22);
+  background: rgba(10, 18, 30, 0.8);
+}
+
+html[data-mode='mobile'] .m-card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 24%;
+  /* 分区配图都是白纸线稿：反相成黑底白线，缩到 64px 才不会糊成一片白噪 */
+  filter: invert(1) grayscale(1) contrast(1.08) brightness(1.02);
+}
+
+html[data-mode='mobile'] .m-card-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+html[data-mode='mobile'] .m-card-no {
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  color: rgba(140, 185, 225, 0.62);
+}
+
+html[data-mode='mobile'] .m-card-label {
+  font-size: 17px;
+  letter-spacing: 0.14em;
+  color: #eaf6ff;
+}
+
+html[data-mode='mobile'] .m-card-role {
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: rgba(170, 205, 235, 0.55);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-mode='mobile'] .m-card-arrow {
+  font-size: 13px;
+  color: rgba(143, 225, 255, 0.55);
+}
+
+html[data-mode='mobile'] .m-foot {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid rgba(140, 180, 225, 0.14);
+}
+
+html[data-mode='mobile'] .m-clock {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+html[data-mode='mobile'] .m-clock-date {
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: rgba(150, 190, 230, 0.6);
+}
+
+html[data-mode='mobile'] .m-clock-time {
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  color: #d7ecff;
+}
+
+html[data-mode='mobile'] .m-links {
+  display: flex;
+  gap: 14px;
+}
+
+html[data-mode='mobile'] .m-links a {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(170, 205, 235, 0.66);
+  text-decoration: none;
+  padding: 6px 0;
+}
+
+/* ---------- 底部分区切换器 ---------- */
+html[data-mode='mobile'] .m-tabs {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: stretch;
+  padding-bottom: var(--m-safe-bottom);
+  border-top: 1px solid rgba(140, 185, 230, 0.2);
+  background: rgba(5, 9, 16, 0.9);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+html[data-mode='mobile'] .m-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(160, 195, 230, 0.6);
+  font: inherit;
+  cursor: pointer;
+}
+
+html[data-mode='mobile'] .m-tab i {
+  font-style: normal;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  opacity: 0.7;
+}
+
+html[data-mode='mobile'] .m-tab span {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+html[data-mode='mobile'] .m-tab.on {
+  color: #8fe1ff;
+}
+
+html[data-mode='mobile'] .m-tab.on i {
+  opacity: 1;
+  color: #ffd166;
+}
+
+html[data-mode='mobile'] .m-tab-home span {
+  font-size: 10px;
+}
+
+/* ---------- 文档页（复用 DocView，只换壳） ---------- */
+html[data-mode='mobile'] .doc {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(58px + var(--m-safe-bottom));
+}
+
+html[data-mode='mobile'] .doc-top {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  padding: calc(10px + var(--m-safe-top)) 14px 8px;
+  background: linear-gradient(180deg, rgba(4, 7, 13, 0.94) 62%, rgba(4, 7, 13, 0));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+html[data-mode='mobile'] .doc.light .doc-top {
+  background: linear-gradient(180deg, rgba(250, 249, 246, 0.95) 62%, rgba(250, 249, 246, 0));
+}
+
+html[data-mode='mobile'] .doc-menu {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+}
+
+html[data-mode='mobile'] .doc-brand-orb {
+  width: 34px;
+  height: 34px;
+}
+
+html[data-mode='mobile'] .doc-b1 {
+  font-size: 13px;
+}
+
+html[data-mode='mobile'] .doc-b2 {
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+html[data-mode='mobile'] .doc-sheet {
+  width: 100%;
+  padding: 4px 14px calc(30px + var(--m-safe-bottom));
+}
+
+html[data-mode='mobile'] .doc-side {
+  display: none;
+}
+
+html[data-mode='mobile'] .doc-title {
+  font-size: 10.5px;
+  margin-bottom: 10px;
+}
+
+html[data-mode='mobile'] .doc-hero {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+html[data-mode='mobile'] .doc-art {
+  height: 190px;
+}
+
+html[data-mode='mobile'] .doc-para {
+  font-size: 12.5px;
+  line-height: 1.95;
+}
+
+html[data-mode='mobile'] .doc-chapter {
+  margin: 20px 0 10px;
+  font-size: 13px;
+}
+
+html[data-mode='mobile'] .doc-body {
+  font-size: 12.5px;
+  line-height: 1.95;
+}
+
+/* 履历 */
+html[data-mode='mobile'] .resume {
+  padding: 14px 14px 16px;
+}
+
+html[data-mode='mobile'] .resume-grid {
+  grid-template-columns: 1fr;
+}
+
+html[data-mode='mobile'] .resume-time-item {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+/* 小说：封面与后记上下排 */
+html[data-mode='mobile'] .novel-landing {
+  grid-template-columns: 1fr;
+}
+
+html[data-mode='mobile'] .novel-cover {
+  max-width: 190px;
+  margin: 0 auto;
+}
+
+html[data-mode='mobile'] .novel-card {
+  grid-template-columns: 84px 1fr;
+}
+
+html[data-mode='mobile'] .novel-page {
+  padding: 0 2px;
+}
+
+html[data-mode='mobile'] .novel-text {
+  font-size: 13px;
+  line-height: 2;
+}
+
+/* 追番评分表 */
+html[data-mode='mobile'] .ar-bar {
+  font-size: 9px;
+}
+
+html[data-mode='mobile'] .ar-title {
+  font-size: 14px;
+}
+
+html[data-mode='mobile'] .ar-tier-label {
+  width: 40px;
+  font-size: 15px;
+}
+
+html[data-mode='mobile'] .ar-tier-zone {
+  gap: 5px;
+  padding: 7px 8px;
+  min-height: 54px;
+}
+
+html[data-mode='mobile'] .ar-cover {
+  width: 44px;
+  height: 62px;
+}
+
+html[data-mode='mobile'] .ar-tip {
+  display: none;
+}
+
+/* 音乐 / 游戏 卡片 */
+html[data-mode='mobile'] .playlist-grid,
+html[data-mode='mobile'] .works-grid {
+  grid-template-columns: 1fr;
+}
+
+html[data-mode='mobile'] .game-wall {
+  height: 340px;
+}
+
+/* ---------- 旅行：地图与画廊 ---------- */
+html[data-mode='mobile'] .travel {
+  margin: 0 -4px;
+}
+
+html[data-mode='mobile'] .tv-panel {
+  padding: 10px 8px 12px;
+}
+
+html[data-mode='mobile'] .tv-bar {
+  font-size: 9px;
+  padding: 0 4px 6px;
+}
+
+html[data-mode='mobile'] .tv-stage {
+  height: clamp(320px, 54vh, 460px);
+}
+
+html[data-mode='mobile'] .tv-chip {
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+html[data-mode='mobile'] .tv-chips {
+  gap: 6px;
+  margin-top: 10px;
+}
+
+html[data-mode='mobile'] .tg-head {
+  padding: calc(8px + var(--m-safe-top)) 12px 6px;
+}
+
+html[data-mode='mobile'] .tg-name {
+  font-size: 20px;
+}
+
+html[data-mode='mobile'] .tg-kicker {
+  font-size: 8.5px;
+}
+
+html[data-mode='mobile'] .tg-sub {
+  font-size: 9.5px;
+}
+
+html[data-mode='mobile'] .tg-exit {
+  padding: 7px 10px;
+  font-size: 10px;
+}
+
+html[data-mode='mobile'] .tg-foot {
+  padding: 8px 12px calc(10px + var(--m-safe-bottom));
+  font-size: 9.5px;
+}
+
+html[data-mode='mobile'] .tg-spots {
+  max-width: 100%;
+  line-height: 1.7;
+}
+
+/* 主题切换 / 目录：抬到底部导航上方，做成小号悬浮球 */
+html[data-mode='mobile'] .doc-bright {
+  width: 42px;
+  height: 42px;
+  right: 12px;
+  bottom: calc(62px + var(--m-safe-bottom));
+  border-color: rgba(200, 226, 250, 0.42);
+  background: rgba(8, 14, 24, 0.82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+html[data-mode='mobile'] .doc-bright svg {
+  width: 17px;
+  height: 17px;
+}
+
+html[data-mode='mobile'] .doc-catalog {
+  left: 12px;
+  bottom: calc(62px + var(--m-safe-bottom));
+}
+
+/* 横屏时收紧纵向间距 */
+@media (orientation: landscape) and (max-height: 500px) {
+  html[data-mode='mobile'] .m-head {
+    padding-bottom: 10px;
+  }
+  html[data-mode='mobile'] .m-brand {
+    font-size: 22px;
+  }
+  html[data-mode='mobile'] .m-card {
+    padding: 7px 10px;
+  }
+  html[data-mode='mobile'] .m-card-art {
+    width: 48px;
+    height: 48px;
+  }
+  html[data-mode='mobile'] .m-card-label {
+    font-size: 15px;
+  }
+}
+
+
+/* 开场：小屏放大主标题 */
+html[data-mode='mobile'] .intro-brand {
+  font-size: 15px;
+  letter-spacing: 0.42em;
+}
+
+html[data-mode='mobile'] .intro-en {
+  font-size: 9px;
+  letter-spacing: 0.34em;
+}
+
+/* 音乐：开场页在小屏改为上下堆叠，封面撑满宽度 */
+html[data-mode='mobile'] .pl-welcome {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+  padding: calc(60px + var(--m-safe-top)) 14px calc(80px + var(--m-safe-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html[data-mode='mobile'] .pl-art {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 2431 / 1080;
+}
+
+html[data-mode='mobile'] .pl-lines {
+  width: 100%;
+}
+
+html[data-mode='mobile'] .pl-lines h2,
+html[data-mode='mobile'] .pl-lines h3 {
+  font-size: 20px;
+  line-height: 1.5;
+}

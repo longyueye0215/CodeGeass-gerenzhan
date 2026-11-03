@@ -1,0 +1,328 @@
+/* ============ 小说目录弹窗（档案室风格） ============ */
+.ncat {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: 40px;
+}
+
+/* 遮罩：仅视觉压暗，不承载交互（关闭走 × / Esc） */
+.ncat-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 4, 8, 0.72);
+  pointer-events: none;
+}
+
+.ncat-panel {
+  position: relative;
+  z-index: 1;
+  width: min(880px, 94vw);
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  background: #171a28;
+  border: 1px solid rgba(214, 228, 250, 0.4);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  animation: ncatIn 0.28s ease both;
+}
+
+@keyframes ncatIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ncat-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(214, 228, 250, 0.2);
+}
+
+.ncat-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: #e8f0ff;
+}
+
+.ncat-crumb-box {
+  width: 10px;
+  height: 10px;
+  background: #dfe7f5;
+}
+
+.ncat-path {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(190, 210, 235, 0.55);
+}
+
+.ncat-close {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 14, 24, 0.6);
+  border: 1px solid rgba(214, 228, 250, 0.35);
+  color: #dfe9f8;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.ncat-close:hover {
+  color: #ffd166;
+  border-color: rgba(255, 209, 102, 0.6);
+}
+
+.ncat-body {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 18px;
+  padding: 18px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------- 左侧大类预览 ---------- */
+.ncat-preview {
+  background: #eef1f7;
+  color: #1d2230;
+  border: 1px solid rgba(10, 14, 24, 0.5);
+  padding: 12px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.ncat-preview-tag {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-align: center;
+  color: #2a3145;
+}
+
+/* 分类封面图：定高区域内完整自适应展示（不裁剪，白底与卡片融为一体） */
+.ncat-preview-img {
+  height: 300px;
+  border: 1px solid #1d2230;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.ncat-preview-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.ncat-preview-desc {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.9;
+  color: #3a4152;
+}
+
+.ncat-preview-meta {
+  margin: 0;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: #6a7286;
+}
+
+.ncat-preview-btn {
+  margin-top: auto;
+  align-self: flex-end;
+  padding: 6px 18px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: #eef1f7;
+  background: #1d2230;
+  border: 1px solid #1d2230;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ncat-preview-btn:hover {
+  background: #2e3650;
+}
+
+/* ---------- 右侧文件夹列表 ---------- */
+.ncat-folders {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 165, 215, 0.3) transparent;
+}
+
+.ncat-group {
+  position: relative;
+  padding-left: 14px;
+}
+
+/* 每组左侧的彩色竖条 */
+.ncat-group::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 3px;
+  background: var(--cat-color, #6fa8dc);
+}
+
+/* 按钮 = 整行命中区：上下 padding 也属于可点击范围，杜绝“点在缝上没反应” */
+.ncat-folder,
+.ncat-doc {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 视觉条：按钮的内层 */
+.ncat-folder .ncat-bar,
+.ncat-doc .ncat-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  transition: background 0.18s, border-color 0.18s, box-shadow 0.18s;
+}
+
+/* 条内所有子元素不拦截事件：整条样式条就是一个实心触碰点 */
+.ncat-folder .ncat-bar > *,
+.ncat-doc .ncat-bar > * {
+  pointer-events: none;
+}
+
+.ncat-folder {
+  padding: 7px 0;
+}
+
+.ncat-folder .ncat-bar {
+  background: #e9edf5;
+  color: #1d2230;
+  border: 1px solid #10141f;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.ncat-folder:hover .ncat-bar {
+  background: #f6f8fc;
+}
+
+.ncat-folder.open .ncat-bar {
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #10141f;
+}
+
+.ncat-doc {
+  padding: 5px 0;
+  margin-left: 22px;
+  width: calc(100% - 22px);
+}
+
+.ncat-doc .ncat-bar {
+  background: #232839;
+  color: #dfe7f4;
+  border: 1px solid rgba(223, 231, 244, 0.55);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  animation: ncatDocIn 0.22s ease both;
+}
+
+@keyframes ncatDocIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ncat-doc:hover .ncat-bar {
+  background: #2c3247;
+  border-color: #dfe7f4;
+}
+
+.ncat-icon-folder,
+.ncat-icon-doc {
+  flex: none;
+  display: block;
+}
+
+.ncat-folder .ncat-icon-folder {
+  color: #1d2230;
+}
+
+.ncat-doc .ncat-icon-doc {
+  color: #dfe7f4;
+}
+
+.ncat-folder .ncat-bar > span,
+.ncat-doc .ncat-bar > span:not(.ncat-arrow) {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ncat-arrow {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-left: 6px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+}
+
+/* 窄屏 */
+@media (max-width: 720px) {
+  .ncat {
+    padding: 16px;
+  }
+
+  .ncat-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .ncat-preview {
+    overflow: visible;
+  }
+}

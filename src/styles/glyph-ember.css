@@ -1,0 +1,33 @@
+/* 三个特效组件的壳：组件内部自己创建 canvas 并塞进 root，所以这里只负责布局 */
+.ge-root,
+.tr-root,
+.nr-root {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ge-content,
+.tr-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+}
+
+.nr-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.nr-content {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
