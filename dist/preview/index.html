@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="robots" content="noindex, nofollow" />
+<title>虚拟设备工作台 · 手机端预览</title>
+<link rel="stylesheet" href="./preview.css?v=3" />
+</head>
+<body>
+<div class="rig">
+
+  <!-- ── 顶栏 ─────────────────────────────────────────── -->
+  <header class="top">
+    <div class="top-brand">
+      <span class="top-mark">◈</span>
+      <div>
+        <h1>虚拟设备工作台 <small>MOBILE PREVIEW RIG</small></h1>
+        <p>在 PC 上逐屏验收独立手机端 · 与线上双端共用同一份构建产物</p>
+      </div>
+    </div>
+    <div class="top-right">
+      <span class="pill" id="conn"><i></i> 等待设备连接</span>
+      <button class="btn ghost" id="copyLink" type="button">复制手机端链接</button>
+      <button class="btn ghost" id="openNew" type="button">新窗口打开</button>
+    </div>
+  </header>
+
+  <div class="body">
+
+    <!-- ── 左：控制台 ───────────────────────────────────── -->
+    <aside class="panel">
+      <section class="grp">
+        <h2>01 / 设备</h2>
+        <label class="field">
+          <span>机型预设</span>
+          <select id="device"></select>
+        </label>
+        <div class="field row" id="customSize" hidden>
+          <label class="mini"><span>宽</span><input id="customW" type="number" min="240" max="1400" value="390" /></label>
+          <label class="mini"><span>高</span><input id="customH" type="number" min="320" max="1600" value="844" /></label>
+        </div>
+        <div class="seg" id="orient">
+          <button type="button" data-v="portrait" class="on">竖屏</button>
+          <button type="button" data-v="landscape">横屏</button>
+        </div>
+        <div class="seg" id="zoom">
+          <button type="button" data-v="fit" class="on">适应</button>
+          <button type="button" data-v="1">100%</button>
+          <button type="button" data-v="0.75">75%</button>
+          <button type="button" data-v="0.5">50%</button>
+        </div>
+      </section>
+
+      <section class="grp">
+        <h2>02 / 页面直达</h2>
+        <div class="pages" id="pages"></div>
+        <p class="hint">分区级深链已接通；子页面（歌单 / 小说目录 / 旅行画廊）协议已预留 <code>sub</code> 字段，待文档页路由化后启用。</p>
+      </section>
+
+      <section class="grp">
+        <h2>03 / 环境</h2>
+        <div class="seg" id="theme">
+          <button type="button" data-v="dark" class="on">暗色</button>
+          <button type="button" data-v="light">亮色</button>
+        </div>
+        <label class="check"><input type="checkbox" id="fast" checked /><span>快速过场（缩短过场时长）</span></label>
+        <label class="check"><input type="checkbox" id="skipLaunch" /><span>跳过启动开屏（直达分区选择）</span></label>
+        <label class="check"><input type="checkbox" id="compare" /><span>并排 PC 端对比</span></label>
+        <label class="check"><input type="checkbox" id="chrome" checked /><span>显示设备装饰</span></label>
+        <label class="check"><input type="checkbox" id="nosw" /><span>禁用离线缓存（nosw）</span></label>
+      </section>
+
+      <section class="grp">
+        <h2>04 / 操作</h2>
+        <div class="actions">
+          <button class="btn" id="reload" type="button">↻ 刷新设备</button>
+          <button class="btn warn" id="clearCache" type="button">清空缓存并重载</button>
+        </div>
+      </section>
+
+      <section class="grp warm">
+        <h2>05 / 预热状态</h2>
+        <div class="bar"><i id="warmBar"></i></div>
+        <div class="warm-num"><b id="warmNum">0 / 0</b><span id="warmPhase">idle</span></div>
+        <dl class="metrics">
+          <div><dt>分区代码包</dt><dd id="chunkState">—</dd></div>
+          <div><dt>当前分区</dt><dd id="sectionState">首页</dd></div>
+          <div><dt>主题</dt><dd id="themeState">暗色</dd></div>
+          <div><dt>当前门禁组</dt><dd id="gateState">—</dd></div>
+        </dl>
+      </section>
+    </aside>
+
+    <!-- ── 中：舞台 ─────────────────────────────────────── -->
+    <main class="stage" id="stage">
+      <div class="stage-inner" id="stageInner">
+
+        <div class="unit" id="phoneUnit">
+          <div class="unit-head"><span>PHONE · MOBILE MODE</span><b id="phoneLabel">—</b></div>
+          <div class="holder" id="phoneHolder">
+            <div class="device" id="phoneDevice" data-chrome="island">
+              <div class="screen">
+                <iframe id="phone" title="手机端预览" allow="fullscreen; autoplay"></iframe>
+                <div class="sb" aria-hidden="true">
+                  <span class="sb-time" id="sbTime">09:41</span>
+                  <span class="sb-right"><i class="sig"></i><i class="wifi"></i><i class="bat"></i></span>
+                </div>
+                <div class="island" aria-hidden="true"></div>
+                <div class="homebar" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="unit compare-unit" id="pcUnit" hidden>
+          <div class="unit-head"><span>DESKTOP · 对比视图</span><b>1000 × 640</b></div>
+          <div class="holder" id="pcHolder">
+            <div class="device pc-device" id="pcDevice">
+              <div class="screen">
+                <iframe id="pc" title="PC 端对比" allow="fullscreen; autoplay"></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ── 底栏 ───────────────────────────────────────────── -->
+  <footer class="foot">
+    <span class="dot" id="dot"></span>
+    <code id="urlText">—</code>
+    <span class="keys">快捷键 <kbd>0</kbd> 首页 <kbd>1</kbd>–<kbd>6</kbd> 分区 <kbd>R</kbd> 刷新 <kbd>O</kbd> 方向 <kbd>C</kbd> 对比 <kbd>F</kbd> 适应</span>
+    <span class="foot-right">调试页 · 主站未放置入口</span>
+  </footer>
+</div>
+<script src="./preview.js?v=3"></script>
+</body>
+</html>

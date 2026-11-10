@@ -1,0 +1,28 @@
+# Cloudflare Pages 缓存规则
+# 带内容 hash 的构建产物永久缓存；图片短缓存 + 后台刷新（改图后最多 1 天生效）；
+# HTML / SW / 预热清单必须每次回源，保证重新部署后立刻看到新版本。
+# 规则按顺序匹配，具体路径必须写在通配规则之前。
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+/images/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/prewarm-manifest.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*
+  Cache-Control: public, max-age=0, must-revalidate
