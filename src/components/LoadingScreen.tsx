@@ -1,4 +1,6 @@
+import { useMemo } from 'react'
 import AstralShell from './AstralShell'
+import { isMobileMode } from '../hooks/useDeviceMode'
 
 function mulberry32(a: number) {
   return () => {
@@ -11,20 +13,26 @@ function mulberry32(a: number) {
 }
 
 const rand = mulberry32(20261029)
-const ROWS = 16
-const COLS = 46
 
-const MATRIX = Array.from({ length: ROWS }, () =>
-  Array.from({ length: COLS }, () => (rand() > 0.5 ? '1' : '0'))
-)
-
-const COILS = Array.from({ length: 18 }, (_, i) => i)
+/** 竖屏把二进制矩阵的 DOM 节点从 736 降到 220 */
+function makeMatrix(rows: number, cols: number) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => (rand() > 0.5 ? '1' : '0'))
+  )
+}
 
 export default function LoadingScreen() {
+  const mobile = isMobileMode()
+  const matrix = useMemo(() => makeMatrix(mobile ? 10 : 16, mobile ? 22 : 46), [mobile])
+  const coils = useMemo(
+    () => Array.from({ length: mobile ? 12 : 18 }, (_, i) => i),
+    [mobile]
+  )
+
   return (
     <div className="loading" aria-live="polite">
       <div className="loading-matrix" aria-hidden="true">
-        {MATRIX.map((row, ri) => (
+        {matrix.map((row, ri) => (
           <p key={ri}>
             {row.map((b, ci) => (
               <span key={ci}>{b}</span>
@@ -38,8 +46,8 @@ export default function LoadingScreen() {
           className="loading-disc"
           backgroundColor="transparent"
           colors={['#DCEBFF', '#FFFFFF']}
-          nodes={820}
-          connections={3}
+          nodes={mobile ? 520 : 820}
+          connections={mobile ? 2 : 3}
           reach={0.24}
           clustering={0.82}
           chords={0.22}
@@ -51,15 +59,15 @@ export default function LoadingScreen() {
           tilt={12}
           interactive={false}
           clickPulse={false}
-          dpr={1.5}
+          dpr={mobile ? 1 : 1.5}
         />
 
         <p className="loading-name">GRAND-STARRS-RAY</p>
 
         <div className="loading-bar">
           <div className="loading-coil" aria-hidden="true">
-            {COILS.map((c) => (
-              <i key={c} style={{ animationDelay: `${c * 0.08}s` }} />
+            {coils.map((c) => (
+              <i key={c} style={{ animationDelay: `${c * (mobile ? 0.06 : 0.08)}s` }} />
             ))}
           </div>
         </div>

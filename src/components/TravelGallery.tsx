@@ -13,9 +13,37 @@ type Props = {
 /** 单张照片在画廊中停留的大致时长，用来推算每段播放时间 */
 const PER_PHOTO_MS = 1400
 
+/**
+ * 竖屏 / 横屏切换会改变 innerWidth，旧实现用 useState 初始值只算一次，
+ * 旋转后画廊参数会一直停在旧尺寸上。这里把宽度做成状态实时跟随。
+ */
+function useViewportWidth() {
+  const [width, setWidth] = useState(() => window.innerWidth)
+  useEffect(() => {
+    const onResize = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', onResize)
+    window.addEventListener('orientationchange', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('orientationchange', onResize)
+    }
+  }, [])
+  return width
+}
+
 export default function TravelGallery({ region, light, onBack, onHome }: Props) {
-  // 手机端整屏更窄：图幅与粒子参数单独给一套，避免图溢出屏幕
-  const [compact] = useState(() => window.innerWidth < 620)
+  const vw = useViewportWidth()
+  const compact = vw < 620
+
+  // 竖屏收窄隧道：间距、扩散、出现范围都按屏宽给一套，避免照片溢出或被拉散
+  const tunnel = {
+    itemWidth: compact ? Math.min(260, Math.round(vw * 0.72)) : 360,
+    spacing: compact ? 300 : 420,
+    spread: compact ? 0.32 : 0.45,
+    revealRange: compact ? 1.6 : 2.2,
+    passRange: compact ? 0.65 : 0.8
+  }
+
   const segments = useMemo(() => {
     const out: string[][] = []
     for (let i = 0; i < region.photos.length; i += SEGMENT_CAP) {
@@ -89,12 +117,12 @@ export default function TravelGallery({ region, light, onBack, onHome }: Props) 
         <ContourTide
           colors={light ? ['#7b8fa3', '#0d4460'] : ['#16303f', '#a8e2ff']}
           backgroundColor={light ? '#f7f5f0' : '#000000'}
-          density={compact ? 0.44 : 0.72}
+          density={compact ? 0.32 : 0.72}
           particleSize={compact ? 1.6 : light ? 1.4 : 1.2}
           waveHeight={1.35}
           choppiness={0.8}
           horizon={0.19}
-          glow={compact ? 0.34 : light ? 0.38 : 0.42}
+          glow={compact ? 0.28 : light ? 0.38 : 0.42}
           foam={0.9}
           speed={0.5}
           parallax={0.5}
@@ -108,13 +136,13 @@ export default function TravelGallery({ region, light, onBack, onHome }: Props) 
       <div className="tg-layer" key={seg}>
         <DollyGallery
           images={images}
-          itemWidth={compact ? Math.min(250, Math.round(window.innerWidth * 0.64)) : 360}
+          itemWidth={tunnel.itemWidth}
           aspectRatio={4 / 5}
-          spacing={420}
-          spread={0.45}
+          spacing={tunnel.spacing}
+          spread={tunnel.spread}
           scatter={0.12}
-          revealRange={2.2}
-          passRange={0.8}
+          revealRange={tunnel.revealRange}
+          passRange={tunnel.passRange}
           grayscale={0}
           autoScroll={300}
           dragSpeed={1.8}
@@ -129,13 +157,13 @@ export default function TravelGallery({ region, light, onBack, onHome }: Props) 
         <div className={`tg-layer is-top${fading ? ' is-out' : ''}`}>
           <DollyGallery
             images={segments[prev].map((src, i) => ({ src, alt: `${region.label} ${i + 1}` }))}
-            itemWidth={compact ? Math.min(250, Math.round(window.innerWidth * 0.64)) : 360}
+            itemWidth={tunnel.itemWidth}
             aspectRatio={4 / 5}
-            spacing={420}
-            spread={0.45}
+            spacing={tunnel.spacing}
+            spread={tunnel.spread}
             scatter={0.12}
-            revealRange={2.2}
-            passRange={0.8}
+            revealRange={tunnel.revealRange}
+            passRange={tunnel.passRange}
             grayscale={0}
             autoScroll={300}
             dragSpeed={1.8}

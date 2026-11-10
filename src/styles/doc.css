@@ -42,7 +42,21 @@
   display: block;
   width: 108px;
   height: 108px;
+  /* 兜底：AstralShell 是 R3F Canvas，根容器必须有定位上下文与明确尺寸。
+     即使组件自身的 CSS 因分包未被注入，球体也不会塌成 0 高。 */
+  position: relative;
+  overflow: hidden;
   filter: drop-shadow(0 0 16px rgba(200, 232, 255, 0.4));
+}
+
+/* 球体元素同时带组件自带的 .as-root（width/height:100%）。
+   合并后的样式表里 .as-root 排在后面、特异性同为 0-1-0，会覆盖上面的 108px；
+   而 .loading-core 高度是 auto，百分比高度退化 → Canvas 容器塌成 0 高，球消失。
+   用更高特异性把绘制区域锁死，且禁止被 flex 压缩。 */
+.loading .loading-disc.as-root {
+  flex: 0 0 108px;
+  width: 108px;
+  height: 108px;
 }
 
 .loading-name {

@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef } from 'react'
+import { isMobileMode } from '../hooks/useDeviceMode'
 
 const HexagonalVault = lazy(() => import('./HexagonalVault'))
 
@@ -30,6 +31,7 @@ const prefersReduced =
  */
 export default function VaultTransition({ duration = 1000, hatch = true, hatchAt = 0.56 }: Props) {
   const rootRef = useRef<HTMLDivElement>(null)
+  const mobile = isMobileMode()
   const door = hatch && !prefersReduced
   const hatchStart = Math.round(duration * hatchAt)
   // 门在 92% 前就开到底，留一点余量给 canvas 初始化的误差
@@ -103,7 +105,7 @@ export default function VaultTransition({ duration = 1000, hatch = true, hatchAt
         <HexagonalVault
           backgroundColor="#04070d"
           colors={['#7FB2F0', '#EAF6FF']}
-          cellSize={3.1}
+          cellSize={mobile ? 3.6 : 3.1}
           lineWidth={1.6}
           litWidth={3.2}
           lattice={1.9}
@@ -125,7 +127,7 @@ export default function VaultTransition({ duration = 1000, hatch = true, hatchAt
           hatchDuration={door ? hatchDuration : 0}
           hatchShift={0.38}
           bare
-          dpr={1.5}
+          dpr={mobile ? 1 : 1.5}
         />
       </Suspense>
     </div>

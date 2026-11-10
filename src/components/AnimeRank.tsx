@@ -71,7 +71,7 @@ export default function AnimeRank() {
                         data-name={c.name}
                         title={c.name}
                       >
-                        <img src={c.src} alt={c.name} loading="lazy" draggable={false} />
+                        <img src={c.src} alt={c.name} decoding="async" draggable={false} />
                         <span className="ar-tip">{c.name}</span>
                       </div>
                     )

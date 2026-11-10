@@ -1,4 +1,5 @@
 import ParticleImage from './ParticleImage'
+import { isMobileMode } from '../hooks/useDeviceMode'
 
 type Props = {
   image: string
@@ -23,24 +24,26 @@ export default function MusicCard({
   barRight,
   onOpen
 }: Props) {
+  const mobile = isMobileMode()
+
   return (
     <article className="music-card">
       <div className="music-art">
         <ParticleImage
           imageUrl={image}
-          particleCount={160000}
-          particleSize={2}
+          particleCount={mobile ? 110000 : 160000}
+          particleSize={mobile ? 1.8 : 2}
           particleOpacity={0.92}
-          speed={0.85}
+          speed={mobile ? 0.6 : 0.85}
           noiseScale={0.0006}
           noiseStrength={0.05}
           damping={0.95}
-          lifespan={240}
+          lifespan={mobile ? 160 : 240}
           showImage={false}
           backgroundColor="#04070d"
-          cursorInteraction
+          cursorInteraction={!mobile}
           cursorRadius={110}
-          dpr={1.6}
+          dpr={mobile ? 1 : 1.6}
         />
         <span className="doc-art-corner tl" aria-hidden="true" />
         <span className="doc-art-corner tr" aria-hidden="true" />

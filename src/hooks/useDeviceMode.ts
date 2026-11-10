@@ -25,6 +25,17 @@ export function applyMode(mode: DeviceMode) {
 }
 
 /**
+ * 运行时同步读取当前模式，供组件在渲染时条件化 WebGL / 动画参数。
+ * 不要在模块顶层调用：ES 模块会先于 main.tsx 的 applyMode() 求值。
+ */
+export function isMobileMode(): boolean {
+  return (
+    typeof document !== 'undefined' &&
+    document.documentElement.dataset.mode === 'mobile'
+  )
+}
+
+/**
  * 手机端与 PC 端是两套独立界面：这里只在「跨过判定阈值」时才切换，
  * 避免手机地址栏收放导致布局反复重挂。
  */

@@ -23,6 +23,8 @@ import VaultTransition from './VaultTransition'
 import { NOVEL_AFTERWORD, NOVEL_CATEGORIES, getNovelStory } from '../data/novels'
 import { NOVEL_CATEGORY_META } from '../data/novelMeta'
 import { introFor } from '../data/sectionIntro'
+import { setSiteLight } from '../lib/siteBus'
+import { isMobileMode } from '../hooks/useDeviceMode'
 
 type Props = {
   slot: SectionSlot
@@ -53,12 +55,13 @@ function sampleShots<T>(pool: T[], n: number): T[] {
 /** 游戏分区图标墙的条目 */
 const GAME_ITEMS = GAME_ICONS.map((g) => ({ src: g.src, alt: g.name, title: g.name }))
 
-/** 诗行 / 日期等短行不做首行缩进 */
-const isShortLine = (p: string) => p.length <= 18
+/** 诗行 / 日期等短行不做首行缩进；竖屏每行字数更少，阈值同步收紧 */
+const isShortLine = (p: string) => p.length <= (isMobileMode() ? 14 : 18)
 
 /**
  * 网格光晕：把指针位置写进 CSS 变量，由 .doc-mesh::after 的径向遮罩
  * 只显示光标附近的亮线，不触发 React 重渲染。
+ * 触屏没有 hover：直接给静态微光，省掉全局指针监听与逐帧写变量。
  */
 function useMeshLight() {
   const ref = useRef<HTMLDivElement>(null)
@@ -66,6 +69,17 @@ function useMeshLight() {
   useEffect(() => {
     const el = ref.current
     if (!el) return
+
+    const finePointer = window.matchMedia
+      ? window.matchMedia('(hover: hover) and (pointer: fine)').matches
+      : false
+    // 手机模式（含 PC 上的 ?mode=mobile 预览）一律按触屏处理
+    if (isMobileMode() || !finePointer) {
+      el.style.setProperty('--mx', `${window.innerWidth / 2}px`)
+      el.style.setProperty('--my', `${window.innerHeight / 2}px`)
+      el.style.setProperty('--ml', '0.35')
+      return
+    }
 
     let raf = 0
     let px = 0
@@ -103,9 +117,14 @@ function useMeshLight() {
 }
 
 export default function DocView({ slot, slots, onHome, onPick }: Props) {
+  // 组件内读取：模块顶层会在 applyMode 之前求值
+  const mobile = isMobileMode()
   const meshRef = useMeshLight()
   const docRef = useRef<HTMLDivElement>(null)
-  const [light, setLight] = useState(false)
+  // 预览套件可用 ?theme=light 直接验收亮色版
+  const [light, setLight] = useState(
+    () => new URLSearchParams(window.location.search).get('theme') === 'light'
+  )
   const [storyId, setStoryId] = useState<string | null>(null)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [mediaPage, setMediaPage] = useState<string | null>(null)
@@ -119,9 +138,12 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
   const gateTimers = useRef<number[]>([])
   const gateBusy = useRef(false)
   const index = slots.findIndex((s) => s.id === slot.id) + 1
+  // 随机池限制在预热清单覆盖的前 160 张内：随机感保留，但每张都已被解码缓存
+  // 竖屏把开场照片从 100 张降到 36 张，预热清单的 gate 前 40 张仍完整覆盖
+  const introBatch = mobile ? 36 : INTRO_BATCH
   const introItems = useMemo(
-    () => (index === 5 ? sampleShots(ANIME_ITEMS, INTRO_BATCH) : []),
-    [index]
+    () => (index === 5 ? sampleShots(ANIME_ITEMS.slice(0, 160), introBatch) : []),
+    [index, introBatch]
   )
   const isNovel = slot.id === NOVEL_SLOT_ID
   const story = storyId ? getNovelStory(storyId) : undefined
@@ -140,6 +162,9 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
     setTrackId(null)
   }, [slot.id])
 
+  // 把当前主题回传给 PC 预览套件的状态栏
+  useEffect(() => setSiteLight(light), [light])
+
   const scrollTop = () => docRef.current?.scrollTo({ top: 0 })
 
   const openStory = (id: string) => {
@@ -157,18 +182,19 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
     return () => gateTimers.current.forEach((t) => window.clearTimeout(t))
   }, [])
 
-  // 追番分区：舱门 → 黑场缓入缓出 → 照片墙从黑暗中涌出（已加速，总时长 ≤5s）
+  // 追番分区：舱门 → 黑场缓入缓出 → 照片墙从黑暗中涌出
+  // 竖屏把 4.3s 开场收成 2.9s，减少首屏等待（PC 时序不变）
   useEffect(() => {
     if (index !== 5) return
     setIntroOn(true)
-    setBlackOn(true) // 门一开就在门后立刻沉入黑场，约 450ms 即纯黑，避免交接时照片墙抢先露脸
+    setBlackOn(true) // 门一开就沉入黑场，避免交接时照片墙抢先露脸
     const timers = [
-      window.setTimeout(() => setBlackOn(false), 450), // 黑场已稳，缓出使照片墙浮现
-      window.setTimeout(() => setIntroOut(true), 3600),
-      window.setTimeout(() => setIntroOn(false), 4300)
+      window.setTimeout(() => setBlackOn(false), mobile ? 320 : 450),
+      window.setTimeout(() => setIntroOut(true), mobile ? 2400 : 3600),
+      window.setTimeout(() => setIntroOn(false), mobile ? 2900 : 4300)
     ]
     return () => timers.forEach((t) => window.clearTimeout(t))
-  }, [index])
+  }, [index, mobile])
 
   const through = (swap: () => void) => {
     if (gateBusy.current) return
@@ -191,19 +217,20 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
         <div className={`game-intro${introOut ? ' out' : ''}`}>
           <ContactSheet
             items={introItems}
-            count={100}
-            speed={0.22}
-            rush={0.78}
+            count={introBatch}
+            speed={mobile ? 0.14 : 0.22}
+            rush={mobile ? 0.55 : 0.78}
             blankArea={0.18}
-            size={0.14}
+            size={mobile ? 0.22 : 0.14}
             sizeVariance={0.35}
             radius={6}
             border={0.02}
             edgeFade={0.6}
-            shadow={0.5}
+            shadow={mobile ? 0.25 : 0.5}
             captions={false}
             draggable={false}
             wheel={false}
+            dpr={mobile ? 1 : 2}
             backgroundColor={light ? '#faf9f6' : '#04070d'}
           />
         </div>
@@ -218,11 +245,11 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
           <TerminalRain
             colors={light ? ['#a9702a', '#e3b96a'] : ['#3DFF8A', '#E8FFF0']}
             backgroundColor={light ? '#faf9f6' : '#04070d'}
-            density={0.32}
-            speed={0.65}
-            trail={0.9}
-            glow={light ? 0.1 : 0.2}
-            intensity={light ? 0.8 : 0.95}
+            density={mobile ? 0.2 : 0.32}
+            speed={mobile ? 0.45 : 0.65}
+            trail={mobile ? 0.82 : 0.9}
+            glow={light ? 0.1 : mobile ? 0.12 : 0.2}
+            intensity={light ? 0.8 : mobile ? 0.75 : 0.95}
             angle={0}
             interactive={false}
           />
@@ -505,20 +532,21 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
                 <ConcaveCarousel
                   items={GAME_ITEMS}
                   aspect={1.08}
-                  size={0.3}
-                  curvature={0.34}
-                  distance={4.4}
-                  gap={20}
+                  size={mobile ? 0.44 : 0.3}
+                  curvature={mobile ? 0.22 : 0.34}
+                  distance={mobile ? 3.6 : 4.4}
+                  gap={mobile ? 10 : 20}
                   radius={18}
-                  reflection={0.07}
+                  reflection={mobile ? 0 : 0.07}
                   dim={0.42}
                   autoplay="drift"
-                  speed={0.1}
+                  speed={mobile ? 0.06 : 0.1}
                   interval={4}
                   captions
                   controls
                   draggable
                   wheel={false}
+                  dpr={mobile ? 1 : 2}
                   backgroundColor="transparent"
                 />
               </div>
@@ -575,19 +603,19 @@ export default function DocView({ slot, slots, onHome, onPick }: Props) {
           <div className="pl-art">
             <ParticleImage
               imageUrl="/images/music/welcome.jpg"
-              particleCount={460000}
-              particleSize={2.2}
+              particleCount={mobile ? 140000 : 460000}
+              particleSize={mobile ? 1.8 : 2.2}
               particleOpacity={0.95}
-              speed={0.55}
+              speed={mobile ? 0.4 : 0.55}
               noiseScale={0.0005}
               noiseStrength={0.018}
               damping={0.96}
-              lifespan={300}
+              lifespan={mobile ? 180 : 300}
               showImage={false}
               backgroundColor="#04070d"
-              cursorInteraction
+              cursorInteraction={!mobile}
               cursorRadius={120}
-              dpr={1.6}
+              dpr={mobile ? 1 : 1.6}
             />
             <span className="pl-art-frame" aria-hidden="true" />
           </div>

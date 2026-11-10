@@ -10,10 +10,18 @@ import BottomHud from './components/BottomHud'
 import IntroSplash from './components/IntroSplash'
 import VaultTransition from './components/VaultTransition'
 import { useDeviceMode } from './hooks/useDeviceMode'
+import { registerChunkLoader, startPrewarm } from './lib/prewarm'
+import {
+  initialSectionFromUrl,
+  skipIntroFromUrl,
+  setSiteMode,
+  setSiteSection,
+  useSiteCommands
+} from './lib/siteBus'
 import MobileApp from './mobile/MobileApp'
 
 // 分区页与控制台都依赖 three.js（约 600KB），首屏用不到：
-// 拆成异步 chunk，等首屏渲染完再预取，用户点进去时已经就绪。
+// 拆成异步 chunk，由预热引擎在首屏空闲期提前下载 + 解码图片。
 const SectionView = lazy(() => import('./components/SectionView'))
 const ConsolePanel = lazy(() => import('./components/ConsolePanel'))
 
@@ -22,13 +30,17 @@ const BOOT_MS = 1000
 
 function DesktopApp() {
   const { pan, dragging, lastDrag, onPointerDown } = usePan()
-  const [view, setView] = useState<string | null>(null)
+  const [view, setView] = useState<string | null>(initialSectionFromUrl)
   const [menuOpen, setMenuOpen] = useState(false)
   const [booting, setBooting] = useState(false)
-  const [introDone, setIntroDone] = useState(false)
+  const [introDone, setIntroDone] = useState(skipIntroFromUrl)
   const [homeGate, setHomeGate] = useState(false)
   const [homeKey, setHomeKey] = useState(0)
   const bootTimer = useRef<number | null>(null)
+
+  useSiteCommands(setView)
+
+  useEffect(() => setSiteSection(view), [view])
 
   useEffect(
     () => () => {
@@ -36,15 +48,6 @@ function DesktopApp() {
     },
     []
   )
-
-  // 首屏渲染完再预取分区页/控制台，点击时不用等
-  useEffect(() => {
-    const id = window.setTimeout(() => {
-      void import('./components/SectionView')
-      void import('./components/ConsolePanel')
-    }, 1500)
-    return () => window.clearTimeout(id)
-  }, [])
 
   const activeSlot = sectionSlots.find((s) => s.id === view) ?? null
 
@@ -157,8 +160,24 @@ function DesktopApp() {
   )
 }
 
-/** 手机端与 PC 端是两套独立界面，这里只做分流 */
+/** 手机端与 PC 端是两套独立界面，这里只做分流 + 全站预热 */
 export default function App() {
   const mode = useDeviceMode()
+
+  useEffect(() => {
+    setSiteMode(mode)
+  }, [mode])
+
+  useEffect(() => {
+    // 分区 chunk 只在这里注册一次，预热引擎负责挑时机执行
+    registerChunkLoader(() =>
+      Promise.all([
+        import('./components/SectionView'),
+        import('./components/ConsolePanel')
+      ])
+    )
+    startPrewarm()
+  }, [])
+
   return mode === 'mobile' ? <MobileApp /> : <DesktopApp />
 }

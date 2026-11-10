@@ -1,6 +1,18 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import type { MetricSlot } from '../data/sections'
-import AstralShell from './AstralShell'
+import type { AstralShellProps } from './AstralShell'
+
+// 陀螺仪光环 / 启动球是 R3F 渲染的。首屏不该为此把 three + r3f 拉进
+// index.html 的 modulepreload；启动仪式盖住全屏，按需加载不会露出空档。
+const AstralShell = lazy(() => import('./AstralShell'))
+
+function LazyShell(props: AstralShellProps) {
+  return (
+    <Suspense fallback={null}>
+      <AstralShell {...props} />
+    </Suspense>
+  )
+}
 import HudChip from './HudChip'
 import InstructionsModal from './InstructionsModal'
 import { useClock } from '../hooks/useClock'
@@ -97,7 +109,7 @@ export default function BottomHud({ metrics, brand, onConsole }: Props) {
       <div className="hud-station hud-station-left">
         <div className="hud-top">
           <div className="hud-orbit">
-            <AstralShell
+            <LazyShell
               backgroundColor="transparent"
               colors={['#DCEBFF', '#FFFFFF']}
               nodes={760}
@@ -155,7 +167,7 @@ export default function BottomHud({ metrics, brand, onConsole }: Props) {
         onClick={onConsole}
       >
         <span className="hud-ball">
-          <AstralShell
+          <LazyShell
             backgroundColor="transparent"
             colors={['#8FB8E8', '#EAF6FF']}
             nodes={1200}
